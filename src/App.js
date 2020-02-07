@@ -1,22 +1,13 @@
 import React, { useState, useEffect }from 'react';
 import './App.css';
 
-const a = 3;
 
 function App() {
   // const [ name, setName ] = useState('yiling');
   const userName = setInputValue('yiling');
   const engName = setInputValue('daisy');
-
-
-    setDocumentTitle(userName.value);
-
-
+  setDocumentTitle(userName.value);
   const width = getWindowWidth();
-
-
-
-
 
     return (
     <div className="App">
@@ -59,7 +50,6 @@ function setInputValue(initialValue) {
 
 // 注意此处 useEffect 第二个参数 [title] 表示只有title变化时起效，性能优化作用
 // 如果不设置，其他useEffect 导致dom重新渲染，这个useEffect 会起效，打印documentEffect
-
 function setDocumentTitle(title) {
     useEffect(() => {
         console.log('documentEffect');
