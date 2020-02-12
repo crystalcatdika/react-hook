@@ -1,21 +1,34 @@
-import React, { useState, useEffect }from 'react';
+import React, { useState, useEffect, useRef }from 'react';
 import './App.css';
 
 
 function App() {
+   // 练习useState useEffect
   // const [ name, setName ] = useState('yiling');
-  const userName = setInputValue('yiling');
+  const name = setInputValue('yiling');
   const engName = setInputValue('daisy');
-  setDocumentTitle(userName.value);
+  setDocumentTitle(name.value);
   const width = getWindowWidth();
 
-    return (
+  // 定义useAsync
+  const userId = 1;
+  const getUserName = (userId) => Promise.resolve('管理员');
+  const { loading, username} = useAsync(() => getUserName(userId), [userId]);
+
+  // useRef
+    const inputEl = useRef(null);
+    const onButtonClick = () => {
+        console.log(inputEl.current);
+        inputEl.current.focus();
+    };
+
+  return (
     <div className="App">
       <header className="App-header">
         <div>
-            <p>{userName.value} {engName.value}</p>
+            <p>{name.value} {engName.value}</p>
             <input
-                { ...userName }
+                { ...name }
                 // value={name}
                 // onChange={ (e) => { setName(e.target.value)}}
             />
@@ -34,6 +47,13 @@ function App() {
                     width < 400 ? 'small' : ''
                 }
             </p>
+        </div>
+        <div>
+            <p>用户名: { username }</p>
+        </div>
+        <div>
+            <input ref={inputEl} type="text" />
+            <button onClick={onButtonClick}>Focus the input</button>
         </div>
       </header>
     </div>
@@ -75,8 +95,32 @@ function getWindowWidth() {
 }
 
 
+function useAsync(getData, condition) {
+    const [loading, setloading] = useState(false);
+    const [username, setusername] = useState('');
+    const count = useRef(0);
+
+    useEffect(() => {
+        //多次调用，只取最后一次结果
+        const currentCount = count.current;
+        setloading(true);
+        getData().then((res) => {
+            if(count.current !== currentCount)
+            setloading(false);
+            setusername(res);
+        });
+        // 组件
+        return () => {
+            count.current += 1;
+        }
+    }, condition);
 
 
+    return {
+        loading,
+        username
+    }
+}
 
 
 export default App;
