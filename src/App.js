@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef }from 'react';
+import 'antd/dist/antd.css';
 import './App.css';
+import useFriendStatus from './useFriendStatus';
+import { Button } from 'antd';
 
 
 function App() {
@@ -8,7 +11,7 @@ function App() {
   const name = setInputValue('yiling');
   const engName = setInputValue('daisy');
   setDocumentTitle(name.value);
-  const width = getWindowWidth();
+  const width = useWindowWidth();
 
   // 定义useAsync
   const userId = 1;
@@ -53,7 +56,7 @@ function App() {
         </div>
         <div>
             <input ref={inputEl} type="text" />
-            <button onClick={onButtonClick}>Focus the input</button>
+            <Button type="primary" onClick={onButtonClick}>Focus the input</Button>
         </div>
       </header>
     </div>
@@ -77,7 +80,7 @@ function setDocumentTitle(title) {
     },[title]);
 }
 
-function getWindowWidth() {
+function useWindowWidth() {
     const [ width, setWidth] = useState(window.innerWidth);
 
     useEffect( () => {
@@ -122,5 +125,32 @@ function useAsync(getData, condition) {
     }
 }
 
+
+const friendList = [
+    { id: 1, name: 'Phoebe' },
+    { id: 2, name: 'Rachel' },
+    { id: 3, name: 'Ross' },
+];
+
+function ChatRecipientPicker() {
+    const [recipientID, setRecipientID] = useState(1);
+    const isRecipientOnline = useFriendStatus(recipientID);
+
+    return (
+        <>
+            <span color={isRecipientOnline ? 'green' : 'red'} >{ isRecipientOnline }</span>
+            <select
+                value={recipientID}
+                onChange={e => setRecipientID(Number(e.target.value))}
+            >
+                {friendList.map(friend => (
+                    <option key={friend.id} value={friend.id}>
+                        {friend.name}
+                    </option>
+                ))}
+            </select>
+        </>
+    );
+}
 
 export default App;
