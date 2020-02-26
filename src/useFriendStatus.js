@@ -4,15 +4,20 @@ function useFriendStatus(friendID) {
     const [isOnline, setIsOnline] = useState(null);
 
     useEffect(() => {
-        function handleStatusChange(status) {
-            setIsOnline(status.isOnline);
-        }
+        // function handleStatusChange(status) {
+            if(friendID > 2) {
+              setIsOnline('在线');
+            } else {
+              setIsOnline('下线');
+            }
 
-        ChatAPI.subscribeToFriendStatus(friendID, handleStatusChange);
+        // }
+
+        // ChatAPI.subscribeToFriendStatus(friendID, handleStatusChange);
         return () => {
-            ChatAPI.unsubscribeFromFriendStatus(friendID, handleStatusChange);
+            // ChatAPI.unsubscribeFromFriendStatus(friendID, handleStatusChange);
         };
-    });
+    }, [friendID]);
 
     return isOnline;
 }

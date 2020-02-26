@@ -2,40 +2,46 @@ import React, { useState, useEffect, useRef }from 'react';
 import 'antd/dist/antd.css';
 import './App.css';
 import useFriendStatus from './useFriendStatus';
-import { Button } from 'antd';
+import { Button, Input,Select, Spin } from 'antd';
 
 
 function App() {
    // 练习useState useEffect
   // const [ name, setName ] = useState('yiling');
-  const name = setInputValue('yiling');
-  const engName = setInputValue('daisy');
-  setDocumentTitle(name.value);
+  const name = useInputValue('yiling');
+  const engName = useInputValue('daisy');
+  useDocumentTitle(name.value);
   const width = useWindowWidth();
 
   // 定义useAsync
   const userId = 1;
-  const getUserName = (userId) => Promise.resolve('管理员');
-  const { loading, username} = useAsync(() => getUserName(userId), [userId]);
+  const getUserName = (userId) => {
+    const userInfo = new Promise( (resolve, reject) =>{
+      setTimeout(() => resolve('管理员'), 2000)
+    })
+    return userInfo
+  };
+  const { loading, username} = useAsync(getUserName, userId);
 
   // useRef
     const inputEl = useRef(null);
     const onButtonClick = () => {
-        console.log(inputEl.current);
+        // console.log(inputEl.current);
         inputEl.current.focus();
     };
+
 
   return (
     <div className="App">
       <header className="App-header">
         <div>
             <p>{name.value} {engName.value}</p>
-            <input
+            <Input
                 { ...name }
                 // value={name}
                 // onChange={ (e) => { setName(e.target.value)}}
             />
-            <input
+            <Input
                 { ...engName }
                 // value={name}
                 // onChange={ (e) => { setName(e.target.value)}}
@@ -52,18 +58,26 @@ function App() {
             </p>
         </div>
         <div>
+            {
+              loading && <Spin/>
+            }
             <p>用户名: { username }</p>
         </div>
         <div>
-            <input ref={inputEl} type="text" />
+            <Input ref={inputEl} type="text" />
             <Button type="primary" onClick={onButtonClick}>Focus the input</Button>
+        </div>
+        <div>
+          {
+            ChatRecipientPicker()
+          }
         </div>
       </header>
     </div>
   );
 }
 
-function setInputValue(initialValue) {
+function useInputValue(initialValue) {
   const [ value, setValue ] = useState(initialValue);
   return {
     value,
@@ -73,7 +87,7 @@ function setInputValue(initialValue) {
 
 // 注意此处 useEffect 第二个参数 [title] 表示只有title变化时起效，性能优化作用
 // 如果不设置，其他useEffect 导致dom重新渲染，这个useEffect 会起效，打印documentEffect
-function setDocumentTitle(title) {
+function useDocumentTitle(title) {
     useEffect(() => {
         console.log('documentEffect');
         document.title = title;
@@ -98,7 +112,7 @@ function useWindowWidth() {
 }
 
 
-function useAsync(getData, condition) {
+function useAsync(getData, userId) {
     const [loading, setloading] = useState(false);
     const [username, setusername] = useState('');
     const count = useRef(0);
@@ -107,8 +121,10 @@ function useAsync(getData, condition) {
         //多次调用，只取最后一次结果
         const currentCount = count.current;
         setloading(true);
-        getData().then((res) => {
-            if(count.current !== currentCount)
+        getData(userId).then((res) => {
+            if(count.current !== currentCount) {
+              return;
+            }
             setloading(false);
             setusername(res);
         });
@@ -116,7 +132,7 @@ function useAsync(getData, condition) {
         return () => {
             count.current += 1;
         }
-    }, condition);
+    }, [userId]);
 
 
     return {
@@ -133,23 +149,23 @@ const friendList = [
 ];
 
 function ChatRecipientPicker() {
-    const [recipientID, setRecipientID] = useState(1);
+    const [recipientID, setRecipientID] = useState(friendList[0].id);
     const isRecipientOnline = useFriendStatus(recipientID);
 
     return (
-        <>
-            <span color={isRecipientOnline ? 'green' : 'red'} >{ isRecipientOnline }</span>
-            <select
+        <div>
+            <p >{ isRecipientOnline }</p>
+            <Select
                 value={recipientID}
-                onChange={e => setRecipientID(Number(e.target.value))}
+                onChange={ value =>setRecipientID(Number(value))}
             >
                 {friendList.map(friend => (
-                    <option key={friend.id} value={friend.id}>
+                    <Select.Option key={friend.id} value={friend.id}>
                         {friend.name}
-                    </option>
+                    </Select.Option>
                 ))}
-            </select>
-        </>
+            </Select>
+        </div>
     );
 }
 
