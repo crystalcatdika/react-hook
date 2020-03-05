@@ -168,5 +168,5 @@ function ChatRecipientPicker() {
         </div>
     );
 }
-// 你要去哪呀 yiling know
+// 你要去哪呀 yiling
 export default App;
