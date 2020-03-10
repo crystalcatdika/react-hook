@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef }from 'react';
-import 'antd/dist/antd.css';
 import './App.css';
-import useFriendStatus from './useFriendStatus';
 import { Button, Input,Select, Spin } from 'antd';
-
+import useFriendStatus from './useFriendStatus';
 
 function App() {
    // 练习useState useEffect
